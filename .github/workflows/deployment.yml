@@ -59,8 +59,13 @@
 
        - name: Build Project
          run: |
-           cd ./tech-challenge-microservico-pedido
            ls
+           cd ./tech-challenge-microservico-pedido
+           pwd
+           cd ./tech-challenge-microservico-pagamento
+           pwd
+           cd ./tech-challenge-microservico-producao
+           pwd
            # mvn clean install -DskipTests
 
        # - name: Build Docker Image
