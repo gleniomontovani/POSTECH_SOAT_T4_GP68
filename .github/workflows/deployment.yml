@@ -62,9 +62,9 @@
            ls
            cd ./tech-challenge-microservico-pedido
            pwd
-           cd ./tech-challenge-microservico-pagamento
+           cd ./$GITHUB_WORKSPACE/tech-challenge-microservico-pagamento
            pwd
-           cd ./tech-challenge-microservico-producao
+           cd ./$GITHUB_WORKSPACE/tech-challenge-microservico-producao
            pwd
            # mvn clean install -DskipTests
 
