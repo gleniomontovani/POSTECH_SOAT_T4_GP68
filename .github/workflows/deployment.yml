@@ -63,7 +63,9 @@
            mvn clean install -DskipTests
 
        - name: Build Docker Image
-         run: docker build 
+         run: |
+           cd $GITHUB_WORKSPACE/tech-challenge-microservico-pedido
+           docker build 
            --build-arg DB_ENDPOINT=$RDS_ENDPOINT 
            --build-arg AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} 
            --build-arg AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} 
@@ -71,7 +73,9 @@
            -t ${{ secrets.DOCKER_PEDIDO_IMAGE }} .
 
        - name: Push Image Docker
-         run: docker push ${{ secrets.DOCKER_PEDIDO_IMAGE }}
+         run: |
+           cd $GITHUB_WORKSPACE/tech-challenge-microservico-pedido
+           docker push ${{ secrets.DOCKER_PEDIDO_IMAGE }}
 
    # deploy:
    #   runs-on: ubuntu-latest
