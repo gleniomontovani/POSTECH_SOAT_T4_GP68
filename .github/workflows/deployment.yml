@@ -60,7 +60,7 @@
        - name: Build Project
          run: |
            ls
-           cd ./tech-challenge-microservico-pedido
+           cd $GITHUB_WORKSPACE/tech-challenge-microservico-pedido
            pwd
            cd $GITHUB_WORKSPACE/tech-challenge-microservico-pagamento
            pwd
