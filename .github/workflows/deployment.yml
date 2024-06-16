@@ -30,8 +30,9 @@
       - name: Download Environment Variable
         run: |
           aws s3 cp s3://${{ secrets.AWS_BUCKET }}/${{ secrets.AWS_S3_BUCKET_SOURCE_DB }} download.txt
-          RDS_ENDPOINT=$(cat download.txt)
-          echo "RDS_ENDPOINT=$RDS_ENDPOINT" > rds_endpoint.txt
+          # RDS_ENDPOINT=$(cat download.txt)
+          # echo "RDS_ENDPOINT=$RDS_ENDPOINT" > rds_endpoint.txt
+          cat download.txt > rds_endpoint.txt
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
