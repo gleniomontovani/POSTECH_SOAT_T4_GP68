@@ -27,7 +27,6 @@
           aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-
       - name: Download Environment Variable
         run: |
           aws s3 cp s3://${{ secrets.AWS_BUCKET }}/${{ secrets.AWS_S3_BUCKET_SOURCE_DB }} download.txt
@@ -78,30 +77,30 @@
            RDS_ENDPOINT=$(cat rds_endpoint.txt)
            echo "RDS_ENDPOINT=$RDS_ENDPOINT" >> $GITHUB_ENV
 
-       - name: Setup Java
-         uses: actions/setup-java@v3
-         with:
-           distribution: 'temurin'
-           java-version: '17'
+       # - name: Setup Java
+       #   uses: actions/setup-java@v3
+       #   with:
+       #     distribution: 'temurin'
+       #     java-version: '17'
 
-       - name: Build Project
-         run: |
-           cd $GITHUB_WORKSPACE/tech-challenge-microservico-pedido
-           mvn clean install -DskipTests
+       # - name: Build Project
+       #   run: |
+       #     cd $GITHUB_WORKSPACE/tech-challenge-microservico-pedido
+       #     mvn clean install -DskipTests
 
-       - name: Login Docker Hub
-         run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}  
+       # - name: Login Docker Hub
+       #   run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}  
         
        - name: Build Docker Image
          run: |
            cd $GITHUB_WORKSPACE/tech-challenge-microservico-pedido
-           echo "RDS_ENDPOINT: $RDS_ENDPOINT"
-           docker build --build-arg DB_ENDPOINT=$RDS_ENDPOINT --build-arg AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} --build-arg AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} --build-arg AWS_REGION=${{ secrets.AWS_DEFAULT_REGION }} -t ${{ secrets.DOCKER_PEDIDO_IMAGE }} .
+           echo "RDS_ENDPOINT is $RDS_ENDPOINT"
+           # docker build --build-arg DB_ENDPOINT=$RDS_ENDPOINT --build-arg AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} --build-arg AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} --build-arg AWS_REGION=${{ secrets.AWS_DEFAULT_REGION }} -t ${{ secrets.DOCKER_PEDIDO_IMAGE }} .
 
-       - name: Push Image Docker
-         run: |
-           cd $GITHUB_WORKSPACE/tech-challenge-microservico-pedido
-           docker push ${{ secrets.DOCKER_PEDIDO_IMAGE }}
+       # - name: Push Image Docker
+       #   run: |
+       #     cd $GITHUB_WORKSPACE/tech-challenge-microservico-pedido
+       #     docker push ${{ secrets.DOCKER_PEDIDO_IMAGE }}
 
    # deploy:
    #   runs-on: ubuntu-latest
