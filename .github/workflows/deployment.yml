@@ -26,6 +26,17 @@
         run: |
           aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+
+      - name: Download Environment Variable
+        run: |
+          aws s3 cp s3://${{ secrets.AWS_BUCKET }}/${{ secrets.AWS_S3_BUCKET_SOURCE_DB }} download.txt
+          RDS_ENDPOINT=$(cat download.txt)
+          echo "RDS_ENDPOINT=$RDS_ENDPOINT" >> $GITHUB_ENV
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}    
          
    build:
      runs-on: ubuntu-latest
@@ -40,15 +51,15 @@
        - name: Checkout Code
          uses: actions/checkout@v3
              
-       - name: Download Environment Variable
-         run: |
-           aws s3 cp s3://${{ secrets.AWS_BUCKET }}/${{ secrets.AWS_S3_BUCKET_SOURCE_DB }} download.txt
-           RDS_ENDPOINT=$(cat download.txt)
-           echo "RDS_ENDPOINT=$RDS_ENDPOINT" >> $GITHUB_ENV
-         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}  
+       # - name: Download Environment Variable
+       #   run: |
+       #     aws s3 cp s3://${{ secrets.AWS_BUCKET }}/${{ secrets.AWS_S3_BUCKET_SOURCE_DB }} download.txt
+       #     RDS_ENDPOINT=$(cat download.txt)
+       #     echo "RDS_ENDPOINT=$RDS_ENDPOINT" >> $GITHUB_ENV
+       #   env:
+       #    AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+       #    AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+       #    AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}  
 
        - name: Setup Java
          uses: actions/setup-java@v3
@@ -68,6 +79,7 @@
          run: |
            cd $GITHUB_WORKSPACE/tech-challenge-microservico-pedido
            echo $RDS_ENDPOINT
+           echo $GITHUB_ENV
            docker build --build-arg DB_ENDPOINT=$RDS_ENDPOINT --build-arg AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} --build-arg AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} --build-arg AWS_REGION=${{ secrets.AWS_DEFAULT_REGION }} -t ${{ secrets.DOCKER_PEDIDO_IMAGE }} .
 
        - name: Push Image Docker
