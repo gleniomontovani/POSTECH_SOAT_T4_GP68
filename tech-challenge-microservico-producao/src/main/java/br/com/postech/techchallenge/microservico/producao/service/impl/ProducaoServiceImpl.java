@@ -8,6 +8,7 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Service;
 
+import br.com.postech.techchallenge.microservico.producao.configuration.AwsSqsPedidoQueueProperties;
 import br.com.postech.techchallenge.microservico.producao.configuration.ModelMapperConfiguration;
 import br.com.postech.techchallenge.microservico.producao.converts.SituacaoProducaoParaStringConverter;
 import br.com.postech.techchallenge.microservico.producao.domain.ProducaoDocumento;
@@ -20,9 +21,8 @@ import br.com.postech.techchallenge.microservico.producao.model.response.Produca
 import br.com.postech.techchallenge.microservico.producao.repository.ProducaoJpaRepository;
 import br.com.postech.techchallenge.microservico.producao.repository.ProducaoMongoRepository;
 import br.com.postech.techchallenge.microservico.producao.service.ProducaoService;
-import br.com.postech.techchallenge.microservico.producao.service.integracao.ApiMicroServicePedido;
+import br.com.postech.techchallenge.microservico.producao.service.integracao.queue.producer.ProducaoQueueProducer;
 import br.com.postech.techchallenge.microservico.producao.service.integracao.request.PedidoRequest;
-import br.com.postech.techchallenge.microservico.producao.service.integracao.response.PedidoResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
@@ -33,7 +33,8 @@ public class ProducaoServiceImpl implements ProducaoService{
 	private static final ModelMapper MAPPER = ModelMapperConfiguration.getModelMapper();
 	private final ProducaoJpaRepository producaoJpaRepository;
 	private final ProducaoMongoRepository producaoMongoRepository;
-	private final ApiMicroServicePedido apiMicroServicePedido;
+	private final ProducaoQueueProducer producaoQueueProducer;
+	private final AwsSqsPedidoQueueProperties pedidoQueueProperties;
 
 	@Override
 	public List<ProducaoResponse> listarTodasProducaoPorSituacao(Integer situacao) throws BusinessException {
@@ -80,12 +81,11 @@ public class ProducaoServiceImpl implements ProducaoService{
 		producao.setDataFimPreparo(obterDataFimPreparoProducao(producao, producaoRequest.situacaoProducao()));
 		
 		Integer statusPedido = obterStatusPedido(producaoRequest.situacaoProducao());
-		
-		
+				
 		producao = producaoJpaRepository.save(producao);
-		PedidoResponse response = apiMicroServicePedido.atualizarPedido(new PedidoRequest(producao.getNumeroPedido(), statusPedido));
+	
 		var producaoResponse = MAPPER.map(producao, ProducaoResponse.class);
-		producaoResponse.setStatusPedido(StatusPedidoEnum.get(response.getStatusPedido()).getDescricao());
+		producaoResponse.setStatusPedido(StatusPedidoEnum.get(statusPedido).getDescricao());
 		
 		var producaoDocumento = MAPPER.map(producaoResponse, ProducaoDocumento.class);
 		producaoMongoRepository.save(producaoDocumento);
@@ -119,6 +119,32 @@ public class ProducaoServiceImpl implements ProducaoService{
 		return producaoResponse;
 	}
 	
+	@Override
+	public ProducaoResponse atualizarProducaoPedido(ProducaoRequest producaoRequest) throws BusinessException {
+		var producao = producaoJpaRepository
+				.findByNumeroPedido(producaoRequest.numeroPedido())
+				.orElseThrow(() -> new BusinessException("Pedido não encontrado!"));
+		
+		producao.setSituacaoProducao(SituacaoProducaoEnum.get(producaoRequest.situacaoProducao()));
+		producao.setObservacao(producaoRequest.observacao());
+		producao.setDataInicioPreparo(obterDataInicioPreparoProducao(producao, producaoRequest.situacaoProducao()));
+		producao.setDataFimPreparo(obterDataFimPreparoProducao(producao, producaoRequest.situacaoProducao()));
+		
+		Integer statusPedido = obterStatusPedido(producaoRequest.situacaoProducao());
+				
+		producao = producaoJpaRepository.save(producao);
+	
+		var pedido = new PedidoRequest(producao.getNumeroPedido(), statusPedido);
+		var producaoResponse = MAPPER.map(producao, ProducaoResponse.class);
+		producaoResponse.setStatusPedido(StatusPedidoEnum.get(statusPedido).getDescricao());
+		
+		var producaoDocumento = MAPPER.map(producaoResponse, ProducaoDocumento.class);
+		producaoMongoRepository.save(producaoDocumento);
+		producaoQueueProducer.send(pedidoQueueProperties.getConfirmado(), pedido);
+		
+		return producaoResponse;
+	}
+	
 	private LocalDateTime obterDataInicioPreparoProducao(Producao producao, Integer situacao) {
 		return SituacaoProducaoEnum.get(situacao).equals(SituacaoProducaoEnum.EM_PREPARACAO) 
 				? LocalDateTime.now()
@@ -136,4 +162,5 @@ public class ProducaoServiceImpl implements ProducaoService{
 				? StatusPedidoEnum.PRONTO.getValue() 
 				: StatusPedidoEnum.EM_PREPARACAO.getValue();
 	}
+
 }

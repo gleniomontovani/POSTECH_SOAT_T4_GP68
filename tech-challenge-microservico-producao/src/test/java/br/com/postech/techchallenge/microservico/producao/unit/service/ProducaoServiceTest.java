@@ -16,13 +16,13 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import br.com.postech.techchallenge.microservico.producao.configuration.AwsSqsPedidoQueueProperties;
 import br.com.postech.techchallenge.microservico.producao.model.response.ProducaoResponse;
 import br.com.postech.techchallenge.microservico.producao.repository.ProducaoJpaRepository;
 import br.com.postech.techchallenge.microservico.producao.repository.ProducaoMongoRepository;
 import br.com.postech.techchallenge.microservico.producao.service.ProducaoService;
 import br.com.postech.techchallenge.microservico.producao.service.impl.ProducaoServiceImpl;
-import br.com.postech.techchallenge.microservico.producao.service.integracao.ApiMicroServicePedido;
-import br.com.postech.techchallenge.microservico.producao.service.integracao.response.PedidoResponse;
+import br.com.postech.techchallenge.microservico.producao.service.integracao.queue.producer.ProducaoQueueProducer;
 import br.com.postech.techchallenge.microservico.producao.util.ObjectCreatorHelper;
 
 class ProducaoServiceTest {
@@ -33,14 +33,17 @@ class ProducaoServiceTest {
 	@Mock
 	private ProducaoMongoRepository producaoMongoRepository;
 	@Mock
-	private ApiMicroServicePedido apiMicroServicePedido;
+	private ProducaoQueueProducer producaoQueueProducer;
+	@Mock
+	private AwsSqsPedidoQueueProperties pedidoQueueProperties;
 	
 	AutoCloseable openMocks;
 	
 	@BeforeEach
 	void setUp() {
 		openMocks = MockitoAnnotations.openMocks(this);
-		producaoService = new ProducaoServiceImpl(producaoJpaRepository, producaoMongoRepository, apiMicroServicePedido);
+		producaoService = new ProducaoServiceImpl(producaoJpaRepository, producaoMongoRepository, producaoQueueProducer,
+				pedidoQueueProperties);
 	}
 	
 	@AfterEach
@@ -122,7 +125,6 @@ class ProducaoServiceTest {
 		var producaoRequest = ObjectCreatorHelper.obterProducaoRequest();
 		
 		when(producaoJpaRepository.findByNumeroPedido(anyLong())).thenReturn(Optional.of(producaoModel));
-		when(apiMicroServicePedido.atualizarPedido(any())).thenReturn(PedidoResponse.builder().build());
 		when(producaoJpaRepository.save(any())).thenReturn(producaoModel);
 		
 		var produtoResponse = producaoService.atualizarStatusProducao(producaoRequest);
@@ -134,7 +136,6 @@ class ProducaoServiceTest {
 		assertThat(produtoResponse).extracting(ProducaoResponse::getDataInicioPreparo).isEqualTo(producaoModel.getDataInicioPreparo().toString());
 
 		verify(producaoJpaRepository, times(1)).findByNumeroPedido(anyLong());
-		verify(apiMicroServicePedido, times(1)).atualizarPedido(any());
 		verify(producaoJpaRepository, times(1)).save(any());
 	}
 }

@@ -70,7 +70,10 @@ public class Constantes {
     
     public static final String FAIL_TRY_PAYMENT							= "Falha ao tentar efetuar o pagamento!";
     public static final String SUCESS_MAKE_PAYMENT						= "O pagamento foi efetuado com sucesso!";
-
+    public static final String DESCRIPTION_PRODUCTION_CREATE			= "Nova produção gerada!";
+    public static final String DESCRIPTION_PRODUCTION_UPDATE			= "Produção em andamento!";
+    public static final String DESCRIPTION_PRODUCTION_FINISH			= "Pedido finalizado!";
+    
 	public static final int INT_ZERO 									= 0;
 	public static final int INT_UM 										= 1;
 	public static final int INT_DOIS									= 2;

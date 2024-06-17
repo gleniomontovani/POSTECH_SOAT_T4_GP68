@@ -44,6 +44,6 @@ public class ProducaoController {
 	
 	@PutMapping(consumes = MediaType.APPLICATION_JSON, produces = MediaType.APPLICATION_JSON)
 	public ResponseEntity<ProducaoResponse> atualizarStatusProducao(@RequestBody @Valid ProducaoRequest producaoRequest){	
-		return new ResponseEntity<>(producaoService.atualizarStatusProducao(producaoRequest), HttpStatus.OK);
+		return new ResponseEntity<>(producaoService.atualizarProducaoPedido(producaoRequest), HttpStatus.OK);
 	}
 }

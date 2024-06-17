@@ -12,4 +12,5 @@ public interface ProducaoService {
 	ProducaoResponse buscarProducaoPorNumeroPedido(Long numeroPedido) throws BusinessException;
 	ProducaoResponse salvarProducaoPedido(ProducaoRequest producaoRequest) throws BusinessException;
 	ProducaoResponse atualizarStatusProducao(ProducaoRequest producaoRequest) throws BusinessException;
+	ProducaoResponse atualizarProducaoPedido(ProducaoRequest producaoRequest) throws BusinessException;
 }
