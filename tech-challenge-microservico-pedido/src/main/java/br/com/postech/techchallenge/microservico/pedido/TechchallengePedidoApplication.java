@@ -2,10 +2,12 @@ package br.com.postech.techchallenge.microservico.pedido;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+
+import br.com.postech.techchallenge.microservico.pedido.configuration.AwsSqsQueueProperties;
 
 @SpringBootApplication
-@EnableFeignClients
+@EnableConfigurationProperties({ AwsSqsQueueProperties.class})
 public class TechchallengePedidoApplication {
 
 	public static void main(String[] args) {

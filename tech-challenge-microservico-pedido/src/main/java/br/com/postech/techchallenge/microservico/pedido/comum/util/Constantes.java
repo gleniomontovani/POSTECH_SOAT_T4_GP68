@@ -27,6 +27,12 @@ public class Constantes {
     public static final String PRODUTO_NOME								= "Coca-Cola";
     public static final String PRODUTO_DESCRICAO						= "Refrigerante Coca-Cola";
     
+    public static final String IMAGEM_QRCODE_PATH						= "qrcode.png";
+    public static final String NOME_DESTINATARIO_PIX_QRCODE				= "Glenio Montovani";
+    public static final String CHAVE_DESTINATARIO_PIX_QRCODE			= "89250362153";
+    public static final String CIDADE_DESTINATARIO_PIX_QRCODE			= "Goiania";
+    public static final String DESCRICAO_PIX_QRCODE						= "PIX em Java";
+    
     public static final String SECRET_CLIENTE_ID 						= "123321a";
     public static final String SCOPE_READ 								= "read";
     public static final String SCOPE_WRITE 								= "write";

@@ -77,8 +77,7 @@ class PedidoControllerTest {
 		.andExpect(jsonPath("$.[0].numeroPedido").value(pedidoResponse1.getNumeroPedido()))
         .andExpect(jsonPath("$.[0].cliente").exists())
         .andExpect(jsonPath("$.[0].dataPedido").value(pedidoResponse1.getDataPedido()))
-        .andExpect(jsonPath("$.[0].statusPedido").value(pedidoResponse1.getStatusPedido()))
-        .andExpect(jsonPath("$.[0].statusPagamento").value(pedidoResponse1.getStatusPagamento()));
+        .andExpect(jsonPath("$.[0].statusPedido").value(pedidoResponse1.getStatusPedido()));
 		
 		verify(pedidoService, times(1)).findTodosPedidosAtivos();
 	}
@@ -96,8 +95,7 @@ class PedidoControllerTest {
 		.andExpect(jsonPath("$.numeroPedido").value(pedidoResponse.getNumeroPedido()))
         .andExpect(jsonPath("$.cliente").exists())
         .andExpect(jsonPath("$.dataPedido").value(pedidoResponse.getDataPedido()))
-        .andExpect(jsonPath("$.statusPedido").value(pedidoResponse.getStatusPedido()))
-        .andExpect(jsonPath("$.statusPagamento").value(pedidoResponse.getStatusPagamento()));
+        .andExpect(jsonPath("$.statusPedido").value(pedidoResponse.getStatusPedido()));
 		
 		verify(pedidoService, times(1)).findById(anyInt());
 	}
@@ -118,8 +116,7 @@ class PedidoControllerTest {
 		.andExpect(jsonPath("$.numeroPedido").value(pedidoResponse.getNumeroPedido()))
         .andExpect(jsonPath("$.cliente").exists())
         .andExpect(jsonPath("$.dataPedido").value(pedidoResponse.getDataPedido()))
-        .andExpect(jsonPath("$.statusPedido").value(pedidoResponse.getStatusPedido()))
-        .andExpect(jsonPath("$.statusPagamento").value(pedidoResponse.getStatusPagamento()));
+        .andExpect(jsonPath("$.statusPedido").value(pedidoResponse.getStatusPedido()));
 		
 		verify(pedidoService, times(1)).fazerPedidoFake(any(PedidoRequest.class));
 	}

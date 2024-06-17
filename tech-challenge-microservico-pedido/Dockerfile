@@ -11,8 +11,14 @@ EXPOSE 8081
 COPY --from=build /app/target/techchallenge-microservico-pedido-1.0.0.jar techchallenge-microservico-pedido.jar
 
 ARG DB_ENDPOINT
+ARG AWS_ACCESS_KEY_ID
+ARG AWS_SECRET_ACCESS_KEY
+ARG AWS_REGION
 
 ENV DB_ENDPOINT=$DB_ENDPOINT
+ENV AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+ENV AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+ENV AWS_REGION=$AWS_REGION
 ENV JAVA_APP_ARGS="--spring.config.location=/src/main/resources/application.properties"
 
 ENTRYPOINT ["java","-jar","techchallenge-microservico-pedido.jar", "$JAVA_APP_ARGS"]

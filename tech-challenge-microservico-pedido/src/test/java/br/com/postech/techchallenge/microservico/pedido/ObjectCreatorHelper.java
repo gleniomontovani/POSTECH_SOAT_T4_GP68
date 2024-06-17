@@ -105,7 +105,6 @@ public class ObjectCreatorHelper {
 				.cliente(obterClienteResponse())
 				.dataPedido(LocalDateTime.now().toString())
 				.statusPedido(StatusPedidoEnum.RECEBIDO.getValue())
-				.statusPagamento(1)
 				.build();
 	}
 	

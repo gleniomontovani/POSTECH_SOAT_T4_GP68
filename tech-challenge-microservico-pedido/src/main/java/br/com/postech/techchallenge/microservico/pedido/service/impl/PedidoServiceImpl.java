@@ -16,6 +16,8 @@ import br.com.postech.techchallenge.microservico.pedido.comum.converts.Categoria
 import br.com.postech.techchallenge.microservico.pedido.comum.converts.StatusPedidoParaInteiroConverter;
 import br.com.postech.techchallenge.microservico.pedido.comum.enums.StatusPedidoEnum;
 import br.com.postech.techchallenge.microservico.pedido.comum.util.CpfCnpjUtil;
+import br.com.postech.techchallenge.microservico.pedido.comum.util.Utilitario;
+import br.com.postech.techchallenge.microservico.pedido.configuration.AwsSqsQueueProperties;
 import br.com.postech.techchallenge.microservico.pedido.configuration.ModelMapperConfiguration;
 import br.com.postech.techchallenge.microservico.pedido.domain.PedidoDocumento;
 import br.com.postech.techchallenge.microservico.pedido.entity.Cliente;
@@ -25,7 +27,6 @@ import br.com.postech.techchallenge.microservico.pedido.entity.Produto;
 import br.com.postech.techchallenge.microservico.pedido.exception.BusinessException;
 import br.com.postech.techchallenge.microservico.pedido.model.request.PagamentoRequest;
 import br.com.postech.techchallenge.microservico.pedido.model.request.PedidoRequest;
-import br.com.postech.techchallenge.microservico.pedido.model.response.PagamentoResponse;
 import br.com.postech.techchallenge.microservico.pedido.model.response.PedidoProdutoResponse;
 import br.com.postech.techchallenge.microservico.pedido.model.response.PedidoResponse;
 import br.com.postech.techchallenge.microservico.pedido.model.response.ProdutoResponse;
@@ -34,7 +35,7 @@ import br.com.postech.techchallenge.microservico.pedido.repository.PedidoJpaRepo
 import br.com.postech.techchallenge.microservico.pedido.repository.PedidoMongoRepository;
 import br.com.postech.techchallenge.microservico.pedido.repository.ProdutoJpaRepository;
 import br.com.postech.techchallenge.microservico.pedido.service.PedidoService;
-import br.com.postech.techchallenge.microservico.pedido.service.integracao.ApiMicroServicePagamento;
+import br.com.postech.techchallenge.microservico.pedido.service.integracao.queue.producer.PedidoQueueProducer;
 import lombok.RequiredArgsConstructor;
 
 
@@ -44,11 +45,12 @@ import lombok.RequiredArgsConstructor;
 public class PedidoServiceImpl implements PedidoService {
 	private static final ModelMapper MAPPER = ModelMapperConfiguration.getModelMapper();
 
+	private final AwsSqsQueueProperties awsSqsQueueProperties;
 	private final PedidoJpaRepository pedidoJpaRepository;
 	private final ClienteJpaRepository clienteJpaRepository;
 	private final ProdutoJpaRepository produtoJpaRepository;
 	private final PedidoMongoRepository pedidoMongoRepository;
-	private final ApiMicroServicePagamento apiMicroServicePagamento;
+	private final PedidoQueueProducer pedidoQueueProducer;
 	
 	@Override
 	public List<PedidoResponse> findTodosPedidosAtivos()throws BusinessException{
@@ -115,9 +117,6 @@ public class PedidoServiceImpl implements PedidoService {
 		valideCliente(pedido);
 
 		valideProduto(pedido);
-
-		//Salva o pedido e obtem seu numero
-		pedido = pedidoJpaRepository.save(pedido);
 		
 		//Obtem o valor total do pedido
 		BigDecimal valorPedido = pedido.getProdutos()
@@ -125,25 +124,27 @@ public class PedidoServiceImpl implements PedidoService {
 				.map(PedidoProduto::total)
 				.reduce((x, y) -> x.add(y))
 				.orElse(BigDecimal.ZERO);
+
+		//Salva o pedido e obtem seu numero
+		pedido = pedidoJpaRepository.save(pedido);			
+		
+		//Geracao de codigo de pagamento PIX
+		var qrCodePix = Utilitario.gerarQrCodePix(valorPedido);
 		
 		//Cria um registro de pagamento no banco como Pendente
-		PagamentoRequest pagamento = new PagamentoRequest(null, pedido.getId(), 1, valorPedido);
-		
-		PagamentoResponse response = apiMicroServicePagamento.criarPagamento(pagamento);
+		PagamentoRequest pagamento = new PagamentoRequest(null,	pedido.getId(),	null, valorPedido,	qrCodePix);				
+		pedidoQueueProducer.send(awsSqsQueueProperties.getSolicitacao(), pagamento);
 
 		MAPPER.typeMap(Pedido.class, PedidoResponse.class)
-		.addMappings(mapperA -> mapperA
-				.using(new StatusPedidoParaInteiroConverter())
-					.map(Pedido::getStatusPedido, PedidoResponse::setStatusPedido))
-		.addMappings(mapper -> {
-			  mapper.map(src -> src.getId(),PedidoResponse::setNumeroPedido);
+			.addMappings(mapperA -> mapperA
+					.using(new StatusPedidoParaInteiroConverter())
+						.map(Pedido::getStatusPedido, PedidoResponse::setStatusPedido))
+			.addMappings(mapper -> {
+				  mapper.map(src -> src.getId(),PedidoResponse::setNumeroPedido);
 		});
 
-		var pedidoResponse = MAPPER.map(pedido, PedidoResponse.class);
-		
-		pedidoResponse.setNumeroPagamento(response.getNumeroPagamento());
-		pedidoResponse.setStatusPagamento(response.getStatusPagamento());
-		pedidoResponse.setQrCodePix(response.getQrCodePix());
+		var pedidoResponse = MAPPER.map(pedido, PedidoResponse.class);		
+		pedidoResponse.setQrCodePix(qrCodePix);
 		
 		var pedidoDocumento = MAPPER.map(pedidoResponse, PedidoDocumento.class);
 		

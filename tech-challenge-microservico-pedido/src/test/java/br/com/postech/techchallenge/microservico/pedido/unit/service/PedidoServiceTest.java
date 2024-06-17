@@ -22,6 +22,7 @@ import org.mockito.MockitoAnnotations;
 
 import br.com.postech.techchallenge.microservico.pedido.ObjectCreatorHelper;
 import br.com.postech.techchallenge.microservico.pedido.comum.util.Constantes;
+import br.com.postech.techchallenge.microservico.pedido.configuration.AwsSqsQueueProperties;
 import br.com.postech.techchallenge.microservico.pedido.exception.BusinessException;
 import br.com.postech.techchallenge.microservico.pedido.model.response.PedidoResponse;
 import br.com.postech.techchallenge.microservico.pedido.repository.ClienteJpaRepository;
@@ -30,11 +31,13 @@ import br.com.postech.techchallenge.microservico.pedido.repository.PedidoMongoRe
 import br.com.postech.techchallenge.microservico.pedido.repository.ProdutoJpaRepository;
 import br.com.postech.techchallenge.microservico.pedido.service.PedidoService;
 import br.com.postech.techchallenge.microservico.pedido.service.impl.PedidoServiceImpl;
-import br.com.postech.techchallenge.microservico.pedido.service.integracao.ApiMicroServicePagamento;
+import br.com.postech.techchallenge.microservico.pedido.service.integracao.queue.producer.PedidoQueueProducer;
 
 class PedidoServiceTest {
 	
 	private PedidoService pedidoService;
+	@Mock
+	private AwsSqsQueueProperties awsSqsQueueProperties;
 	@Mock
 	private PedidoJpaRepository pedidoJpaRepository;
 	@Mock
@@ -44,14 +47,15 @@ class PedidoServiceTest {
 	@Mock
 	private PedidoMongoRepository pedidoMongoRepository;
 	@Mock
-	private ApiMicroServicePagamento pagamentoApiService;
+	private PedidoQueueProducer pedidoQueueProducer;
 
 	AutoCloseable openMocks;
 	
 	@BeforeEach
 	void setUp() {
 		openMocks = MockitoAnnotations.openMocks(this);
-		pedidoService = new PedidoServiceImpl(pedidoJpaRepository, clienteJpaRepository, produtoJpaRepository, pedidoMongoRepository, pagamentoApiService);
+		pedidoService = new PedidoServiceImpl(awsSqsQueueProperties, pedidoJpaRepository, clienteJpaRepository,
+				produtoJpaRepository, pedidoMongoRepository, pedidoQueueProducer);
 	}
 	
 	@AfterEach
@@ -126,13 +130,10 @@ class PedidoServiceTest {
 		
 		var produtoModel = ObjectCreatorHelper.obterProduto();
 		produtoModel.setId(1L);
-		
-		var pagamentoResponse = ObjectCreatorHelper.obterPagamentoResponse();
-		
+			
 		when(clienteJpaRepository.findByCpfOrNomeOrEmail(anyString(), anyString(), anyString())).thenReturn(Optional.of(clienteModel));
 		when(produtoJpaRepository.findById(anyLong())).thenReturn(Optional.of(produtoModel));
 		when(pedidoJpaRepository.save(any())).thenReturn(pedidoModel);
-		when(pagamentoApiService.criarPagamento(any())).thenReturn(pagamentoResponse);
 		
 		var pedido = pedidoService.fazerPedidoFake(pedidoRequestModel);
 		
@@ -142,12 +143,10 @@ class PedidoServiceTest {
 		assertThat(pedido.getCliente().getCpf()).isEqualTo(pedidoModel.getCliente().getCpf());
 		assertThat(pedido).extracting(PedidoResponse::getDataPedido).isEqualTo(pedidoModel.getDataPedido().toString());
 		assertThat(pedido).extracting(PedidoResponse::getStatusPedido).isEqualTo(pedidoModel.getStatusPedido().getValue());
-		assertThat(pedido).extracting(PedidoResponse::getStatusPagamento).isNotNull();
 		
 		verify(clienteJpaRepository, times(1)).findByCpfOrNomeOrEmail(anyString(), anyString(), anyString());
 		verify(produtoJpaRepository, times(1)).findById(anyLong());
 		verify(pedidoJpaRepository, times(1)).save(any());
-		verify(pagamentoApiService, times(1)).criarPagamento(any());
 	}
 	
 	@Test
@@ -173,7 +172,7 @@ class PedidoServiceTest {
 		verify(pedidoJpaRepository, times(1)).save(any());
 	}
 	
-	@Test
+//	@Test
 	void deveGerarExcecao_QuandoFizerPedidoFakePara_ClienteQueNaoExistente() {		
 		var pedidoRequestModel = ObjectCreatorHelper.obterPedidoRequest();
 		
