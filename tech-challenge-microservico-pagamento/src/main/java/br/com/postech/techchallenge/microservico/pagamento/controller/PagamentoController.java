@@ -27,23 +27,17 @@ public class PagamentoController {
 	@GetMapping(path = "/{numeroPedido}", produces = MediaType.APPLICATION_JSON)
 	public ResponseEntity<PagamentoResponse> consultarPagamentoPorPedido(@PathVariable Long numeroPedido)
 			throws Exception {
-		PagamentoResponse pagamento = pagamentoService.consultarStatusPagamentoPorPedido(numeroPedido);
-
-		return new ResponseEntity<>(pagamento, HttpStatus.OK);
+		return new ResponseEntity<>(pagamentoService.consultarStatusPagamentoPorPedido(numeroPedido), HttpStatus.OK);
 	}
 
 	@PostMapping(consumes = MediaType.APPLICATION_JSON, produces = MediaType.APPLICATION_JSON)
 	public ResponseEntity<PagamentoResponse> criarPagamento(@RequestBody PagamentoRequest pagamentoRequest) {
-		PagamentoResponse response = pagamentoService.criarPagamento(pagamentoRequest);
-
-		return new ResponseEntity<>(response, HttpStatus.CREATED);
+		return new ResponseEntity<>(pagamentoService.criarPagamento(pagamentoRequest), HttpStatus.CREATED);
 	}
 
 	@PutMapping(consumes = MediaType.APPLICATION_JSON, produces = MediaType.APPLICATION_JSON)
 	public ResponseEntity<PagamentoResponse> atualizaPagamento(@RequestBody PagamentoRequest pagamentoRequest)
 			throws BusinessException {
-		PagamentoResponse response = pagamentoService.atualizaPagamento(pagamentoRequest);
-
-		return new ResponseEntity<>(response, HttpStatus.OK);
+		return new ResponseEntity<>(pagamentoService.atualizaPagamento(pagamentoRequest), HttpStatus.OK);
 	}
 }

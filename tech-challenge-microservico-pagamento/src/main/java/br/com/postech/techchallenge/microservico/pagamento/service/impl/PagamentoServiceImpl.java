@@ -9,12 +9,12 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Service;
 
+import br.com.postech.techchallenge.microservico.pagamento.configuration.AwsSqsQueueProperties;
 import br.com.postech.techchallenge.microservico.pagamento.configuration.ModelMapperConfiguration;
 import br.com.postech.techchallenge.microservico.pagamento.converts.StatusPagamentoParaInteiroConverter;
 import br.com.postech.techchallenge.microservico.pagamento.domain.PagamentoDocumento;
 import br.com.postech.techchallenge.microservico.pagamento.entity.HistoricoPagamento;
 import br.com.postech.techchallenge.microservico.pagamento.entity.Pagamento;
-import br.com.postech.techchallenge.microservico.pagamento.enums.SituacaoProducaoEnum;
 import br.com.postech.techchallenge.microservico.pagamento.enums.StatusPagamentoEnum;
 import br.com.postech.techchallenge.microservico.pagamento.exception.BusinessException;
 import br.com.postech.techchallenge.microservico.pagamento.exception.NotFoundException;
@@ -24,10 +24,8 @@ import br.com.postech.techchallenge.microservico.pagamento.repository.HistoricoP
 import br.com.postech.techchallenge.microservico.pagamento.repository.PagamentoMongoRepository;
 import br.com.postech.techchallenge.microservico.pagamento.repository.PagamentoRepository;
 import br.com.postech.techchallenge.microservico.pagamento.service.PagamentoService;
-import br.com.postech.techchallenge.microservico.pagamento.service.integracao.ApiMicroServiceProducao;
-import br.com.postech.techchallenge.microservico.pagamento.service.integracao.request.ProducaoRequest;
+import br.com.postech.techchallenge.microservico.pagamento.service.integracao.queue.producer.PagamentoQueueProducer;
 import br.com.postech.techchallenge.microservico.pagamento.util.Constantes;
-import br.com.postech.techchallenge.microservico.pagamento.util.Utilitario;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
@@ -40,7 +38,8 @@ public class PagamentoServiceImpl implements PagamentoService {
 	private final PagamentoRepository pagamentoJpaRepository;
 	private final HistoricoPagamentoRepository historicoPagamentoJpaRepository;
 	private final PagamentoMongoRepository pagamentoMongoRepository;
-	private final ApiMicroServiceProducao apiMicroServiceProducao;
+	private final PagamentoQueueProducer pagamentoQueueProducer;
+	private final AwsSqsQueueProperties properties;
 
 	@Override
 	public PagamentoResponse consultarStatusPagamentoPorPedido(Long numeroPedido) {
@@ -83,13 +82,12 @@ public class PagamentoServiceImpl implements PagamentoService {
 	@Override
 	public PagamentoResponse criarPagamento(PagamentoRequest pagamentoRequest) throws BusinessException {
 		Pagamento pagamentoEntity = pagamentoJpaRepository
-			.findByNumeroPedido(pagamentoRequest.numeroPedido())
+			.findByQrCodePixAndDataPagamentoIsNull(pagamentoRequest.qrCodePix())
 			.orElse(null);
 		
 		if (Objects.isNull(pagamentoEntity)) {
 			var pagamento = MAPPER.map(pagamentoRequest, Pagamento.class);
-			pagamento.setStatusPagamento(StatusPagamentoEnum.get(pagamentoRequest.statusPagamento()));
-			pagamento.setId(pagamentoRequest.numeroPagamento());
+			pagamento.setStatusPagamento(StatusPagamentoEnum.PENDENTE);
 	
 			Integer tentativas = historicoPagamentoJpaRepository.findByPagamentoNumeroPedido(pagamento.getNumeroPedido())
 					.stream().map(HistoricoPagamento::getNumeroTentativas).max(Integer::compare).orElse(0);
@@ -98,12 +96,7 @@ public class PagamentoServiceImpl implements PagamentoService {
 			pagamento.adicionaHistorico(
 					HistoricoPagamento.adicionaHistorico(Constantes.AWAITING_PAYMENT, pagamento, null, tentativas));
 	
-			pagamento.setQrCodePix(Utilitario.gerarQrCodePix(pagamento.getValor()));
-	
-			pagamentoEntity = pagamentoJpaRepository.save(pagamento);
-	
-			apiMicroServiceProducao.salvarProducao(new ProducaoRequest(pagamentoEntity.getNumeroPedido(),
-					Constantes.ORDER_OBSERVATION, SituacaoProducaoEnum.RECEBIDO.getValue()));
+			pagamentoEntity = pagamentoJpaRepository.save(pagamento);			
 		}
 		
 		MAPPER.typeMap(Pagamento.class, PagamentoResponse.class)
@@ -117,6 +110,7 @@ public class PagamentoServiceImpl implements PagamentoService {
 		var pagamentoDocumento = MAPPER.map(pagamentoResponse, PagamentoDocumento.class);
 
 		pagamentoMongoRepository.save(pagamentoDocumento);
+		pagamentoQueueProducer.send(properties.getPendente(), pagamentoResponse);
 		
 		return pagamentoResponse;
 	}
@@ -125,7 +119,6 @@ public class PagamentoServiceImpl implements PagamentoService {
 	public PagamentoResponse atualizaPagamento(PagamentoRequest pagamentoRequest) throws BusinessException {
 		var pagamento = MAPPER.map(pagamentoRequest, Pagamento.class);
 		pagamento.setStatusPagamento(StatusPagamentoEnum.get(pagamentoRequest.statusPagamento()));
-		pagamento.setId(pagamentoRequest.numeroPagamento());
 
 		Integer tentativas = historicoPagamentoJpaRepository.findByPagamentoNumeroPedido(pagamento.getNumeroPedido())
 				.stream().map(HistoricoPagamento::getNumeroTentativas).max(Integer::compare).orElse(0);
@@ -143,9 +136,6 @@ public class PagamentoServiceImpl implements PagamentoService {
 					return pagamentoJpaRepository.save(pagEntity);
 				}).orElseThrow(() -> new BusinessException("Pagamento não encontrado ou já processado!"));
 
-		apiMicroServiceProducao.atualizarProducao(new ProducaoRequest(pagamentoEntity.getNumeroPedido(),
-				Constantes.ORDER_OBSERVATION, SituacaoProducaoEnum.EM_PREPARACAO.getValue()));
-
 		MAPPER.typeMap(Pagamento.class, PagamentoResponse.class)
 				.addMappings(mapperA -> mapperA.using(new StatusPagamentoParaInteiroConverter())
 						.map(Pagamento::getStatusPagamento, PagamentoResponse::setStatusPagamento))
@@ -157,8 +147,8 @@ public class PagamentoServiceImpl implements PagamentoService {
 		var pagamentoDocumento = MAPPER.map(pagamentoResponse, PagamentoDocumento.class);
 
 		pagamentoMongoRepository.save(pagamentoDocumento);
+		pagamentoQueueProducer.send(properties.getConfirmado(), pagamentoResponse);
 
 		return pagamentoResponse;
 	}
-
 }

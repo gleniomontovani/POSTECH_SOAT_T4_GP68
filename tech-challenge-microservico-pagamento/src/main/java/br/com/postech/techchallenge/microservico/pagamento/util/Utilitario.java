@@ -8,6 +8,8 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.com.postech.techchallenge.microservico.pagamento.model.DadosEnvioPix;
@@ -41,5 +43,11 @@ public class Utilitario {
 
 	public static String asJsonString(final Object obj) throws Exception {
 		return new ObjectMapper().writeValueAsString(obj);
+	}
+	
+	public static <T> T asStringJsonFromObject(String json, Class<T> type)  throws Exception {
+		ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json().build();
+		
+		return objectMapper.readValue(json, type);
 	}
 }

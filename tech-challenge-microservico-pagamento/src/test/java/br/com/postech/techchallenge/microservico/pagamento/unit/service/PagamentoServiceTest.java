@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import br.com.postech.techchallenge.microservico.pagamento.configuration.AwsSqsQueueProperties;
 import br.com.postech.techchallenge.microservico.pagamento.entity.Pagamento;
 import br.com.postech.techchallenge.microservico.pagamento.model.response.PagamentoResponse;
 import br.com.postech.techchallenge.microservico.pagamento.repository.HistoricoPagamentoRepository;
@@ -27,7 +28,7 @@ import br.com.postech.techchallenge.microservico.pagamento.repository.PagamentoM
 import br.com.postech.techchallenge.microservico.pagamento.repository.PagamentoRepository;
 import br.com.postech.techchallenge.microservico.pagamento.service.PagamentoService;
 import br.com.postech.techchallenge.microservico.pagamento.service.impl.PagamentoServiceImpl;
-import br.com.postech.techchallenge.microservico.pagamento.service.integracao.ApiMicroServiceProducao;
+import br.com.postech.techchallenge.microservico.pagamento.service.integracao.queue.producer.PagamentoQueueProducer;
 import br.com.postech.techchallenge.microservico.pagamento.util.ObjectCreatorHelper;
 
 class PagamentoServiceTest {
@@ -40,7 +41,9 @@ class PagamentoServiceTest {
 	@Mock
 	private PagamentoMongoRepository pagamentoMongoRepository;
 	@Mock
-	private ApiMicroServiceProducao apiMicroServiceProducao;
+	private PagamentoQueueProducer pagamentoQueueProducer;
+	@Mock
+	private AwsSqsQueueProperties properties;
 
 	AutoCloseable openMocks;
 	
@@ -48,7 +51,7 @@ class PagamentoServiceTest {
 	void setUp() {
 		openMocks = MockitoAnnotations.openMocks(this);
 		pagamentoService = new PagamentoServiceImpl(pagamentoRepository, historicoPagamentoRepository,
-				pagamentoMongoRepository, apiMicroServiceProducao);
+				pagamentoMongoRepository, pagamentoQueueProducer, properties);
 	}
 	
 	@AfterEach

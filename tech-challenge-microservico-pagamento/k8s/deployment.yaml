@@ -19,20 +19,36 @@ spec:
           image: gleniomontovani/tech-challenge-microservico-pagamento:latest
           imagePullPolicy: Always
           ports:
-            - containerPort: 8081
+            - containerPort: 8082
           env:
             - name: DATASOURCE_URL
               value: jdbc:postgresql://${DB_ENDPOINT}/pagamentos
             - name: DATASOURCE_USERNAME
               valueFrom:
-                configMapKeyRef:
-                  name: tech-challenge-microservico-pagamento-config
-                  key: DATASOURCE_USERNAME  
+                secretKeyRef:
+                  key: postgresql-username  
+                  name: tech-challenge-microservico-pagamento-secret
             - name: DATASOURCE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  key: DATASOURCE_PASSWORD
-                  name: tech-challenge-microservico-pagamento-secret            
+                  key: postgresql-password
+                  name: tech-challenge-microservico-pagamento-secret
+            - name: MONGO_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  key: mongo-root-username
+                  name: tech-challenge-microservico-pagamento-secret
+            - name: MONGO_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: mongo-root-password      
+                  name: tech-challenge-microservico-pagamento-secret
+            - name: AWS_ACCESS_KEY
+              value: ${AWS_ACCESS_KEY_ID}    
+            - name: AWS_SECRET_ACCESS
+              value: ${AWS_SECRET_ACCESS_KEY}
+            - name: REGION_AWS
+              value: ${AWS_REGION}                               
           resources:
             requests:
               memory: "512Mi"
