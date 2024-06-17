@@ -175,11 +175,7 @@
      runs-on: ubuntu-latest
      needs: [environment, build-pedido]
      name: Deployment Micro Service Pedido
-     steps: 
-       - name: Enter Project for Pedido
-         run: |
-           cd $GITHUB_WORKSPACE/tech-challenge-microservico-pedido
-           
+     steps:           
        - name: Set Up AWS Credentials
          uses: aws-actions/configure-aws-credentials@v1
          with:
@@ -202,6 +198,7 @@
 
        - name: Apply Kubernetes Configuration
          run: |
+           cd $GITHUB_WORKSPACE/tech-challenge-microservico-pedido
            find k8s -name "*.yaml" -exec kubectl apply -f {} \;
        
        - name: Get Load Balancer URL for Pedido
