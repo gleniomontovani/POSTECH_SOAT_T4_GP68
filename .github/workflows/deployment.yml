@@ -85,91 +85,91 @@
            cd $GITHUB_WORKSPACE/tech-challenge-microservico-pedido
            docker push ${{ secrets.DOCKER_PEDIDO_IMAGE }}
 
-   build-pagamento:
-     runs-on: ubuntu-latest
-     needs: [environment]
-     name: Micro Service Pagamento
-     steps:      
-       - name: Checkout Code
-         uses: actions/checkout@v3
+   # build-pagamento:
+   #   runs-on: ubuntu-latest
+   #   needs: [environment]
+   #   name: Micro Service Pagamento
+   #   steps:      
+   #     - name: Checkout Code
+   #       uses: actions/checkout@v3
 
-       - name: Setup Java
-         uses: actions/setup-java@v3
-         with:
-           distribution: 'temurin'
-           java-version: '17'  
+   #     - name: Setup Java
+   #       uses: actions/setup-java@v3
+   #       with:
+   #         distribution: 'temurin'
+   #         java-version: '17'  
              
-       - name: Download RDS Endpoint artifact
-         uses: actions/download-artifact@v2
-         with:
-           name: rds-endpoint
-           path: .
+   #     - name: Download RDS Endpoint artifact
+   #       uses: actions/download-artifact@v2
+   #       with:
+   #         name: rds-endpoint
+   #         path: .
 
-       - name: Set RDS Endpoint as environment variable
-         run: |
-           RDS_ENDPOINT=$(cat rds_endpoint.txt)
-           echo "RDS_ENDPOINT=$RDS_ENDPOINT" >> $GITHUB_ENV
+   #     - name: Set RDS Endpoint as environment variable
+   #       run: |
+   #         RDS_ENDPOINT=$(cat rds_endpoint.txt)
+   #         echo "RDS_ENDPOINT=$RDS_ENDPOINT" >> $GITHUB_ENV
 
-       - name: Build Project
-         run: |
-           cd $GITHUB_WORKSPACE/tech-challenge-microservico-pagamento
-           mvn clean install -DskipTests
+   #     - name: Build Project
+   #       run: |
+   #         cd $GITHUB_WORKSPACE/tech-challenge-microservico-pagamento
+   #         mvn clean install -DskipTests
 
-       - name: Login Docker Hub
-         run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}  
+   #     - name: Login Docker Hub
+   #       run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}  
         
-       - name: Build Docker Image
-         run: |
-           cd $GITHUB_WORKSPACE/tech-challenge-microservico-pagamento
-           docker build --build-arg DB_ENDPOINT=$RDS_ENDPOINT --build-arg AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} --build-arg AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} --build-arg AWS_REGION=${{ secrets.AWS_DEFAULT_REGION }} -t ${{ secrets.DOCKER_PAGAMENTO_IMAGE }} .
+   #     - name: Build Docker Image
+   #       run: |
+   #         cd $GITHUB_WORKSPACE/tech-challenge-microservico-pagamento
+   #         docker build --build-arg DB_ENDPOINT=$RDS_ENDPOINT --build-arg AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} --build-arg AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} --build-arg AWS_REGION=${{ secrets.AWS_DEFAULT_REGION }} -t ${{ secrets.DOCKER_PAGAMENTO_IMAGE }} .
 
-       - name: Push Image Docker
-         run: |
-           cd $GITHUB_WORKSPACE/tech-challenge-microservico-pagamento
-           docker push ${{ secrets.DOCKER_PAGAMENTO_IMAGE }}
+   #     - name: Push Image Docker
+   #       run: |
+   #         cd $GITHUB_WORKSPACE/tech-challenge-microservico-pagamento
+   #         docker push ${{ secrets.DOCKER_PAGAMENTO_IMAGE }}
 
-   build-producao:
-     runs-on: ubuntu-latest
-     needs: [environment]
-     name: Micro Service Produção
-     steps:      
-       - name: Checkout Code
-         uses: actions/checkout@v3
+   # build-producao:
+   #   runs-on: ubuntu-latest
+   #   needs: [environment]
+   #   name: Micro Service Produção
+   #   steps:      
+   #     - name: Checkout Code
+   #       uses: actions/checkout@v3
 
-       - name: Setup Java
-         uses: actions/setup-java@v3
-         with:
-           distribution: 'temurin'
-           java-version: '17'  
+   #     - name: Setup Java
+   #       uses: actions/setup-java@v3
+   #       with:
+   #         distribution: 'temurin'
+   #         java-version: '17'  
              
-       - name: Download RDS Endpoint artifact
-         uses: actions/download-artifact@v2
-         with:
-           name: rds-endpoint
-           path: .
+   #     - name: Download RDS Endpoint artifact
+   #       uses: actions/download-artifact@v2
+   #       with:
+   #         name: rds-endpoint
+   #         path: .
 
-       - name: Set RDS Endpoint as environment variable
-         run: |
-           RDS_ENDPOINT=$(cat rds_endpoint.txt)
-           echo "RDS_ENDPOINT=$RDS_ENDPOINT" >> $GITHUB_ENV
+   #     - name: Set RDS Endpoint as environment variable
+   #       run: |
+   #         RDS_ENDPOINT=$(cat rds_endpoint.txt)
+   #         echo "RDS_ENDPOINT=$RDS_ENDPOINT" >> $GITHUB_ENV
 
-       - name: Build Project
-         run: |
-           cd $GITHUB_WORKSPACE/tech-challenge-microservico-producao
-           mvn clean install -DskipTests
+   #     - name: Build Project
+   #       run: |
+   #         cd $GITHUB_WORKSPACE/tech-challenge-microservico-producao
+   #         mvn clean install -DskipTests
 
-       - name: Login Docker Hub
-         run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}  
+   #     - name: Login Docker Hub
+   #       run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}  
         
-       - name: Build Docker Image
-         run: |
-           cd $GITHUB_WORKSPACE/tech-challenge-microservico-producao
-           docker build --build-arg DB_ENDPOINT=$RDS_ENDPOINT --build-arg AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} --build-arg AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} --build-arg AWS_REGION=${{ secrets.AWS_DEFAULT_REGION }} -t ${{ secrets.DOCKER_PRODUCAO_IMAGE }} .
+   #     - name: Build Docker Image
+   #       run: |
+   #         cd $GITHUB_WORKSPACE/tech-challenge-microservico-producao
+   #         docker build --build-arg DB_ENDPOINT=$RDS_ENDPOINT --build-arg AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} --build-arg AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} --build-arg AWS_REGION=${{ secrets.AWS_DEFAULT_REGION }} -t ${{ secrets.DOCKER_PRODUCAO_IMAGE }} .
 
-       - name: Push Image Docker
-         run: |
-           cd $GITHUB_WORKSPACE/tech-challenge-microservico-producao
-           docker push ${{ secrets.DOCKER_PRODUCAO_IMAGE }}          
+   #     - name: Push Image Docker
+   #       run: |
+   #         cd $GITHUB_WORKSPACE/tech-challenge-microservico-producao
+   #         docker push ${{ secrets.DOCKER_PRODUCAO_IMAGE }}          
 
    deploy-pedido:
      runs-on: ubuntu-latest
