@@ -76,6 +76,9 @@ public class Constantes {
     
     public static final String FAIL_TRY_PAYMENT							= "Falha ao tentar efetuar o pagamento!";
     public static final String SUCESS_MAKE_PAYMENT						= "O pagamento foi efetuado com sucesso!";
+    
+    public static final String SQL_CREATE_DABASE_PEDIDO					= "CREATE DATABASE pedidos";
+    public static final String SQL_CHECK_EXIST_DATABASE_PEDIDO			= "SELECT COUNT(*) FROM pg_database WHERE datname = 'pedidos'";
 
 	public static final int INT_ZERO 									= 0;
 	public static final int INT_UM 										= 1;
