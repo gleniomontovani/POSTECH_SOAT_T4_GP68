@@ -1,4 +1,4 @@
- name: Build and Deploy API
+ name: Build and Deploy Microserviço de Pedido
 
  # on:
  #   pull_request:
@@ -8,7 +8,7 @@
   workflow_dispatch:
     inputs:
       dir:
-        description: 'Directory with resources to be destroyed'
+        description: 'Directory with resources to make deploy'
         required: true
         default: 'terraform'
       
