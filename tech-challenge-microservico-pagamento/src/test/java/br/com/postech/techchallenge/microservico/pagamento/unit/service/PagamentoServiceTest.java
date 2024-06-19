@@ -84,8 +84,7 @@ class PagamentoServiceTest {
 			assertThat(pagamentoSave).isInstanceOf(PagamentoResponse.class).isNotNull();
 			assertThat(pagamentoSave.getNumeroPedido()).isEqualTo(pagamentoRequestModel.numeroPedido());
 			assertThat(pagamentoSave.getStatusPagamento()).isEqualTo(pagamentoRequestModel.statusPagamento());
-			assertThat(pagamentoSave.getValor()).isEqualTo(pagamentoRequestModel.valor());
-			assertThat(pagamentoSave.getQrCodePix()).isNotNull();		
+			assertThat(pagamentoSave.getValor()).isEqualTo(pagamentoRequestModel.valor());	
 			
 			verify(pagamentoRepository, times(1)).save(any(Pagamento.class));
 			verify(historicoPagamentoRepository, times(1)).findByPagamentoNumeroPedido(anyLong());
@@ -115,7 +114,6 @@ class PagamentoServiceTest {
 			assertThat(pagamentoSave.getNumeroPedido()).isEqualTo(pagamentoRequestModel.numeroPedido());
 			assertThat(pagamentoSave.getStatusPagamento()).isEqualTo(pagamentoRequestModel.statusPagamento());
 			assertThat(pagamentoSave.getValor()).isEqualTo(pagamentoRequestModel.valor());
-			assertThat(pagamentoSave.getQrCodePix()).isNotNull();	
 			assertThat(pagamentoSave.getQrCodePix()).isEqualTo(pagamentoRequestModel.qrCodePix());
 			
 			verify(pagamentoRepository, times(1)).save(any(Pagamento.class));

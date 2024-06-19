@@ -22,7 +22,7 @@ spec:
             - containerPort: 8082
           env:
             - name: DATASOURCE_URL
-              value: jdbc:postgresql://${DB_ENDPOINT}/pagamentos
+              value: jdbc:postgresql://${DB_ENDPOINT}
             - name: DATASOURCE_USERNAME
               valueFrom:
                 secretKeyRef:

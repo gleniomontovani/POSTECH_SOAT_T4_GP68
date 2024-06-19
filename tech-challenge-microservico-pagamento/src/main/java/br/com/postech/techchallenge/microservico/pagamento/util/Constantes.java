@@ -68,6 +68,9 @@ public class Constantes {
     public static final String AWAITING_PAYMENT							= "Aguardando efetuar o pagamento!";
     public static final String SUCESS_MAKE_PAYMENT						= "O pagamento foi efetuado com sucesso!";
     public static final String ORDER_OBSERVATION						= "SEM BATATAS";
+    
+    public static final String SQL_CREATE_DABASE_PAGAMENTO				= "CREATE DATABASE pagamentos";
+    public static final String SQL_CHECK_EXIST_DATABASE_PAGAMENTO		= "SELECT COUNT(*) FROM pg_database WHERE datname = 'pagamentos'";
 
 	public static final int INT_ZERO 									= 0;
 	public static final int INT_UM 										= 1;
