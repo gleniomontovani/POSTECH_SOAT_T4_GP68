@@ -10,7 +10,7 @@
       dir:
         description: 'Directory with resources to make deploy'
         required: true
-        default: 'terraform'
+        default: 'tech-challenge-microservico-pedido'
       
  jobs:
    environment:
