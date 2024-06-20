@@ -74,6 +74,9 @@ public class Constantes {
     public static final String DESCRIPTION_PRODUCTION_UPDATE			= "Produção em andamento!";
     public static final String DESCRIPTION_PRODUCTION_FINISH			= "Pedido finalizado!";
     
+    public static final String SQL_CREATE_DABASE_PRODUCAO				= "CREATE DATABASE producao";
+    public static final String SQL_CHECK_EXIST_DATABASE_PRODUCAO		= "SELECT COUNT(*) FROM pg_database WHERE datname = 'producao'";
+    
 	public static final int INT_ZERO 									= 0;
 	public static final int INT_UM 										= 1;
 	public static final int INT_DOIS									= 2;
