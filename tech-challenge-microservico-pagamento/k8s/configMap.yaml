@@ -3,6 +3,7 @@ kind: ConfigMap
 metadata:
   creationTimestamp: null
   name: tech-challenge-microservico-pagamento-config
+  namespace: tech-challenge-pos-tech
   labels:
     app: tech-challenge-microservico-pagamento
 data:

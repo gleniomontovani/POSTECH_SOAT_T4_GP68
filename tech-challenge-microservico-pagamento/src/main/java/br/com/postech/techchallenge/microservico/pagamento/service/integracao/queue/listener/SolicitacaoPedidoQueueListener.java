@@ -20,7 +20,7 @@ public class SolicitacaoPedidoQueueListener {
 	@SqsListener(value = "${queue.pedido.solicitacao}")
 	public void receive(String message) throws BusinessException {
 		try {
-            log.debug("Mensagem recebida: {}", message );
+            log.debug("Mensagem de Solicitação de Pedido recebida: {}", message );
             PagamentoRequest pagamento = Utilitario.asStringJsonFromObject(message, PagamentoRequest.class);
 
             pagamentoService.criarPagamento(pagamento);
