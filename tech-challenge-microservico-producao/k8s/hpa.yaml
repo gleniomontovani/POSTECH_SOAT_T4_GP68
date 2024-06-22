@@ -2,6 +2,7 @@ apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:
   name: tech-challenge-microservico-producao-hpa
+  namespace: tech-challenge-pos-tech
   labels:
     app: tech-challenge-microservico-producao
 spec:
