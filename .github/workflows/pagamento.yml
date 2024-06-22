@@ -115,18 +115,3 @@
            cd $GITHUB_WORKSPACE/tech-challenge-microservico-pagamento
            kubectl create namespace ${{ secrets.NAMESPACE }} || true
            find k8s -name "*.yaml" -exec kubectl apply -f {} --namespace=${{ secrets.NAMESPACE }} \;
-       
-       - name: Get Load Balancer URL for Pagamento
-         run: |
-           kubectl get service ${{ secrets.KUBERNETES_SERVICES_PAGAMENTO }} -o=jsonpath='{.spec.clusterIP}' > endpoint_microservice_pagamento.txt
-
-       - name: Upload File to S3 for Pagamento
-         run: |
-           aws s3 cp endpoint_microservice_pagamento.txt s3://${{ secrets.AWS_BUCKET }}/${{ secrets.AWS_S3_BUCKET_SOURCE_APP }}/endpoint_microservice_pagamento --acl private
-           rm -r endpoint_microservice_pagamento.txt
-         env:
-           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-           AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}            
-
-    
