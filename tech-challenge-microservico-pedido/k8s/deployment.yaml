@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: tech-challenge-microservico-pedido
+  namespace: tech-challenge-pos-tech
   labels:
     app: tech-challenge-microservico-pedido
 spec:

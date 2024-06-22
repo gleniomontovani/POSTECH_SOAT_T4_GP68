@@ -20,7 +20,7 @@ public class PedidoConfirmadoQueueListener {
 	@SqsListener(value = "${queue.pedido.confirmado}")
 	public void receive(String message) throws BusinessException {
 		try {
-            log.debug("Mensagem recebida: {}", message );
+            log.debug("Mensagem Pedido Confirmado recebida: {}", message );
             PedidoRequest pedido = Utilitario.asStringJsonFromObject(message, PedidoRequest.class);
 
             pedidoService.atualizarPedido(pedido);
