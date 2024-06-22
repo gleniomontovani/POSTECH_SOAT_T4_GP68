@@ -22,12 +22,18 @@ public class PagamentoConfirmadoQueueListener {
 	@SqsListener(value = "${queue.pagamento.confirmado}")
 	public void receive(String message) throws BusinessException {
 		try {
+			log.debug(" ");
+			log.debug("---------------------------------------------------------");
+			log.debug(" ");
 			log.debug("Mensagem de Pagamento Confirmado recebida: {}", message);
 			PagamentoResponse pagamento = Utilitario.asStringJsonFromObject(message, PagamentoResponse.class);
 
 			var producao = new ProducaoRequest(pagamento.getNumeroPedido(), Constantes.DESCRIPTION_PRODUCTION_UPDATE,
 					pagamento.getStatusPagamento());
 			producaoService.atualizarStatusProducao(producao);
+            log.debug(" ");
+            log.debug(" ");
+            log.debug("---------------------------------------------------------");
 		} catch (Exception e) {
 			throw new BusinessException("Cannot process message from SQS", e);
 		}
