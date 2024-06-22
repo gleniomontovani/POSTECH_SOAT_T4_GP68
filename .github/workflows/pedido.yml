@@ -116,15 +116,3 @@
            kubectl create namespace ${{ secrets.NAMESPACE }} || true
            find k8s -name "*.yaml" -exec kubectl apply -f {} --namespace=${{ secrets.NAMESPACE }} \;
        
-       - name: Get Load Balancer URL for Pedido
-         run: |
-           kubectl get service ${{ secrets.KUBERNETES_SERVICES_PEDIDO }} -o=jsonpath='{.spec.clusterIP}' > endpoint_microservice_pedido.txt
-
-       - name: Upload File to S3 for Pedido
-         run: |
-           aws s3 cp endpoint_microservice_pedido.txt s3://${{ secrets.AWS_BUCKET }}/${{ secrets.AWS_S3_BUCKET_SOURCE_APP }}/endpoint_microservice_pedido --acl private
-           rm -r endpoint_microservice_pedido.txt
-         env:
-           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-           AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}         
