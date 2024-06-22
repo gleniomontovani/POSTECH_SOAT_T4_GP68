@@ -113,7 +113,8 @@
        - name: Apply Kubernetes Configuration
          run: |
            cd $GITHUB_WORKSPACE/tech-challenge-microservico-pedido
-           find k8s -name "*.yaml" -exec kubectl apply -f {} \;
+           kubectl create namespace ${{ secrets.NAMESPACE }} || true
+           find k8s -name "*.yaml" -exec kubectl apply -f {} --namespace=${{ secrets.NAMESPACE }} \;
        
        - name: Get Load Balancer URL for Pedido
          run: |
