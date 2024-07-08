@@ -105,18 +105,20 @@ public class ProducaoServiceImpl implements ProducaoService{
 			producao.setDataInicioPreparo(obterDataInicioPreparoProducao(producao, producaoRequest.situacaoProducao()));
 			
 			producaoEntity = producaoJpaRepository.save(producao);
+			
+			MAPPER.typeMap(Producao.class, ProducaoResponse.class)
+			.addMappings(mapperA -> mapperA.using(new SituacaoProducaoParaStringConverter())
+					.map(Producao::getSituacaoProducao, ProducaoResponse::setStatusPedido));
+	
+			var producaoResponse = MAPPER.map(producaoEntity, ProducaoResponse.class);
+			var producaoDocumento = MAPPER.map(producaoResponse, ProducaoDocumento.class);
+			
+			producaoMongoRepository.save(producaoDocumento);
+			
+			return producaoResponse;
 		}
 		
-		MAPPER.typeMap(Producao.class, ProducaoResponse.class)
-				.addMappings(mapperA -> mapperA.using(new SituacaoProducaoParaStringConverter())
-						.map(Producao::getSituacaoProducao, ProducaoResponse::setStatusPedido));
-		
-		var producaoResponse = MAPPER.map(producaoEntity, ProducaoResponse.class);
-		var producaoDocumento = MAPPER.map(producaoResponse, ProducaoDocumento.class);
-		
-		producaoMongoRepository.save(producaoDocumento);
-		
-		return producaoResponse;
+		return MAPPER.map(producaoEntity, ProducaoResponse.class);
 	}
 	
 	@Override

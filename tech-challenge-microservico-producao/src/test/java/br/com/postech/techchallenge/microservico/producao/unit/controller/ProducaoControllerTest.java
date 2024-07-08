@@ -129,7 +129,7 @@ class ProducaoControllerTest {
 		var producaoResponse = ObjectCreatorHelper.obterProducaoResponse();
 		producaoResponse.setNumeroPedido(1L);
 		
-		when(producaoService.atualizarStatusProducao(any(ProducaoRequest.class))).thenReturn(producaoResponse);
+		when(producaoService.atualizarProducaoPedido(any(ProducaoRequest.class))).thenReturn(producaoResponse);
 		
 		mockMvc.perform(put("/v1/producao")
 				.contentType(MediaType.APPLICATION_JSON)
@@ -140,6 +140,6 @@ class ProducaoControllerTest {
         .andExpect(jsonPath("$.statusPedido").value(producaoResponse.getStatusPedido()))
         .andExpect(jsonPath("$.observacao").value(producaoResponse.getObservacao()));
 		
-		verify(producaoService, times(1)).atualizarStatusProducao(any(ProducaoRequest.class));
+		verify(producaoService, times(1)).atualizarProducaoPedido(any(ProducaoRequest.class));
 	}
 }
