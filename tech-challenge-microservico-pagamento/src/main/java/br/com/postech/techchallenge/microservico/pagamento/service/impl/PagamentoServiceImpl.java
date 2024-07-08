@@ -82,7 +82,7 @@ public class PagamentoServiceImpl implements PagamentoService {
 	@Override
 	public PagamentoResponse criarPagamento(PagamentoRequest pagamentoRequest) throws BusinessException {
 		Pagamento pagamentoEntity = pagamentoJpaRepository
-			.findByQrCodePixAndDataPagamentoIsNull(pagamentoRequest.qrCodePix())
+			.findByNumeroPedido(pagamentoRequest.numeroPedido())
 			.orElse(null);
 		
 		if (Objects.isNull(pagamentoEntity)) {
@@ -96,23 +96,25 @@ public class PagamentoServiceImpl implements PagamentoService {
 			pagamento.adicionaHistorico(
 					HistoricoPagamento.adicionaHistorico(Constantes.AWAITING_PAYMENT, pagamento, null, tentativas));
 	
-			pagamentoEntity = pagamentoJpaRepository.save(pagamento);			
+			pagamentoEntity = pagamentoJpaRepository.save(pagamento);		
+			
+			MAPPER.typeMap(Pagamento.class, PagamentoResponse.class)
+			.addMappings(mapperA -> mapperA.using(new StatusPagamentoParaInteiroConverter())
+					.map(Pagamento::getStatusPagamento, PagamentoResponse::setStatusPagamento))
+			.addMappings(mapperB -> {
+				mapperB.map(src -> src.getId(), PagamentoResponse::setNumeroPagamento);
+			});
+	
+			var pagamentoResponse = MAPPER.map(pagamentoEntity, PagamentoResponse.class);
+			var pagamentoDocumento = MAPPER.map(pagamentoResponse, PagamentoDocumento.class);
+		
+			pagamentoMongoRepository.save(pagamentoDocumento);
+			pagamentoQueueProducer.send(properties.getPendente(), pagamentoResponse);
+			
+			return pagamentoResponse;
 		}
 		
-		MAPPER.typeMap(Pagamento.class, PagamentoResponse.class)
-				.addMappings(mapperA -> mapperA.using(new StatusPagamentoParaInteiroConverter())
-						.map(Pagamento::getStatusPagamento, PagamentoResponse::setStatusPagamento))
-				.addMappings(mapperB -> {
-					mapperB.map(src -> src.getId(), PagamentoResponse::setNumeroPagamento);
-				});
-		
-		var pagamentoResponse = MAPPER.map(pagamentoEntity, PagamentoResponse.class);
-		var pagamentoDocumento = MAPPER.map(pagamentoResponse, PagamentoDocumento.class);
-
-		pagamentoMongoRepository.save(pagamentoDocumento);
-		pagamentoQueueProducer.send(properties.getPendente(), pagamentoResponse);
-		
-		return pagamentoResponse;
+		return MAPPER.map(pagamentoEntity, PagamentoResponse.class);
 	}
 
 	@Override
