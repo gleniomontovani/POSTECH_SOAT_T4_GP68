@@ -16,12 +16,12 @@ Este projeto é um dos módulos que compõe esta solução.
 1. **Módulo:** Backend.
 1. **Arquitetura:** Microserviço com API Gateway.
 1. **Padrões de Codificação:** Clean code.
-1. **Linguagem:** Java versão 17.
+1. **Padrão SAGA:** Coreografada.
+2. **Linguagem:** Java versão 17.
 1. **Banco de Dados:** PostgreSQL e MongoDB.
 1. **Container:** Docker.
-1. **Orquestrador:** Kubernetes.
-
-
+1. **Orquestrador de Container:** Kubernetes.
+ 
 ##### 2. Desenhos Arquiteturais.
 
 ###### 2.1. Requisitos de Infraestrutura.
@@ -33,6 +33,8 @@ Segue abaixo o desenho de infraestrutura definido:
 ![Infraestrutura AWS!](src/main/resources/images/kubernetes-in-docker.png "Infraestrutura AWS")
 
 ###### 2.2. Requisitos de negócio (problema).
+
+Para esta solução usamos o padrão SAGA Coreografada, pois dada que o projeto é de pequeno porte e não temos muita complexidade negocial, este padrão será o mais adequado dado a sua simplicidade de implantação e compreensão. Também ajustamos todos os mestodos para atender as propriedades de ACID para fazer contramedidas caso as transações venham a falhar.
 
 ###### 2.2.1. Arquitetura de Microserviços.
 Conforme informado anteriormente<sub>[1]</sub>, o padrão arquitetural definido para esse projeto foi a de microserviços. A arquitetura de microsserviços (geralmente chamada de microsserviços) refere-se a um estilo de arquitetura para o desenvolvimento de aplicativos. Os microsserviços permitem que um aplicativo grande seja separado em partes independentes menores, com cada parte tendo sua própria responsabilidade. Para atender a uma única solicitação do usuário, um aplicativo baseado em microsserviços pode chamar muitos microsserviços internos para compor a resposta.
@@ -46,17 +48,21 @@ Para esse módulo, aplicamos esse conceito da seguinte forma:
 
 1. Rode/Suba a pipeline da infraestrutura de [banco de dados](https://github.com/gleniomontovani/tech-challenge-pos-tech-postgres-terraform/actions/workflows/deploy_infraestrutura.yml).
 1. Depois suba a infraestrutura de serviços da AWS como: [EKS, EC2, Cognito e VPC](https://github.com/gleniomontovani/tech-challenge-pos-tech-infraestrutura-terraform/actions/workflows/create_infra_api.yml).
-1. Após isso, suba os microserviços: <br>
-   3.1 - Primeiro rode o microserviço de [Pedidos](https://github.com/gleniomontovani/POSTECH_SOAT_T4_GP68/actions/workflows/pedido.yml)
-   3.2 - Depois rode o microserviço  de [Pagamento](https://github.com/gleniomontovani/POSTECH_SOAT_T4_GP68/actions/workflows/pagamento.yml)
-   3.3 - Posteriormente, rode o microserviço de [Produção](https://github.com/gleniomontovani/POSTECH_SOAT_T4_GP68/actions/workflows/producao.yml) 
+1. Agora rode a pipeline da [API Gateway](https://github.com/gleniomontovani/tech-challenge-api-gateway/actions/workflows/deploy_aplication.yml)
+1. Após isso, rode/suba os microserviços: <br>
+   4.1 - Primeiro rode o microserviço de [Pedidos](https://github.com/gleniomontovani/POSTECH_SOAT_T4_GP68/actions/workflows/pedido.yml) <br>
+   4.2 - Depois rode o microserviço  de [Pagamento](https://github.com/gleniomontovani/POSTECH_SOAT_T4_GP68/actions/workflows/pagamento.yml) <br>
+   4.3 - Posteriormente, rode o microserviço de [Produção](https://github.com/gleniomontovani/POSTECH_SOAT_T4_GP68/actions/workflows/producao.yml) <br>
 
 As infraestrutura de banco de dados e de serviços AWS estão com as pipeline configuradas para rodarem de forma manual. Já as pipeline dos microserviços e da API Gateway rodaram com um Pull Request para a branch main.
 
-##### 4. As APIs da aplicação ficarão acessíveis no endereço:
+##### 4. Segurança:
+Para esse sistema foi usado o OWASP Zap para verificação de segurança, no qual foi executado o mesmo na API Gateway e verificada e existencia de alguma vunerabilidade foi feita a correção das mesma.
 
-- **URL:** [http://localhost:32000](http://localhost:32000)
+Segue abaixo os link:
 
+1 - [Original](https://gleniomontovani.github.io/tech-challenge-api-gateway/original.html) <br/>
+2 - [Corrigido](https://gleniomontovani.github.io/tech-challenge-api-gateway/corrigido.html) <br/>
 
 ---
 ##### 5. As APIs disponíveis são: &nbsp;
@@ -79,7 +85,6 @@ As infraestrutura de banco de dados e de serviços AWS estão com as pipeline co
    4.2. Histórico de tentativas de pagamento (Webhook).
 
 &nbsp;
-
 ---
 
-> * Para utilizar as APIs, baixe o arquivo [JSON](https://github.com/gleniomontovani/tech-challenge-pos-tech/blob/main/Tech-challenge.postman_collection.json) e faça a importação no Postaman.
+> * Para utilizar as APIs, baixe o arquivo [JSON](https://github.com/gleniomontovani/tech-challenge-pos-tech/blob/main/Tech-challenge.postman_collection.json),  faça a importação no Postaman e altere a URL para a que foi gerada no Loand Balancer da AWS.
