@@ -64,8 +64,13 @@ Segue abaixo os link:
 1 - [Original](https://gleniomontovani.github.io/tech-challenge-api-gateway/original.html) <br/>
 2 - [Corrigido](https://gleniomontovani.github.io/tech-challenge-api-gateway/corrigido.html) <br/>
 
+##### 5. Relatório de Impacto dos Dados:
+
+Para este projeto foi feito uma análise de impacto dos dados pessoais no sistemas. Essa análise resultou no seguinte [relatório](https://github.com/gleniomontovani/POSTECH_SOAT_T4_GP68/blob/main/RIPD.docx).
+
+
 ---
-##### 5. As APIs disponíveis são: &nbsp;
+##### 6. As APIs disponíveis são: &nbsp;
 
 1. Cliente:   
    1.1. Criação;    
@@ -87,4 +92,4 @@ Segue abaixo os link:
 &nbsp;
 ---
 
-> * Para utilizar as APIs, baixe o arquivo [JSON](https://github.com/gleniomontovani/tech-challenge-pos-tech/blob/main/Tech-challenge.postman_collection.json),  faça a importação no Postaman e altere a URL para a que foi gerada no Loand Balancer da AWS.
+> * Para utilizar as APIs, baixe o arquivo [JSON](https://github.com/gleniomontovani/tech-challenge-api-gateway/blob/main/Tech-challenge.postman_collection.json), faça a importação no Postaman e altere a URL para a que foi gerada no Loand Balancer da AWS.
