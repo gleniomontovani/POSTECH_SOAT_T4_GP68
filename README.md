@@ -66,8 +66,7 @@ Segue abaixo os link:
 
 ##### 5. Relatório de Impacto dos Dados:
 
-Para este projeto foi feito uma análise de impacto dos dados pessoais no sistemas. Essa análise resultou no seguinte [relatório](https://github.com/gleniomontovani/POSTECH_SOAT_T4_GP68/blob/main/RIPD.docx).
-
+Para este projeto foi feito uma análise de impacto dos dados pessoais (RIPD) no sistemas. Essa análise resultou no seguinte [relatório](https://github.com/gleniomontovani/POSTECH_SOAT_T4_GP68/blob/main/RIPD.docx).
 
 ---
 ##### 6. As APIs disponíveis são: &nbsp;
