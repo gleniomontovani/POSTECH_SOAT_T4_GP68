@@ -26,7 +26,7 @@ Este projeto é um dos módulos que compõe esta solução.
 
 ###### 2.1. Requisitos de negócio (problema).
 
-Para esta solução usamos o padrão SAGA Coreografada, pois o projeto é de pequeno porte e não temos muita complexidade negocial, este padrão será o mais adequado dado a sua simplicidade de implantação e compreensão. Também ajustamos todos os metodos para atender as propriedades de ACID e fazer contramedidas caso as transações venham a falhar.
+Para esta solução usamos o padrão SAGA Coreografada, pois o projeto é de pequeno porte e não temos muita complexidade negocial, portanto este padrão será o mais adequado dado a sua simplicidade de implantação e compreensão. Também ajustamos todos os metodos para atender as propriedades de ACID e fazer contramedidas caso as transações venham a falhar.
 
 ###### 2.1.1. Arquitetura de Microserviços.
 Conforme informado anteriormente<sub>[1]</sub>, o padrão arquitetural definido para esse projeto foi a de microserviços. A arquitetura de microsserviços (geralmente chamada de microsserviços) refere-se a um estilo de arquitetura para o desenvolvimento de aplicativos. Os microsserviços permitem que um aplicativo grande seja separado em partes independentes menores, com cada parte tendo sua própria responsabilidade. Para atender a uma única solicitação do usuário, um aplicativo baseado em microsserviços pode chamar muitos microsserviços internos para compor a resposta.
