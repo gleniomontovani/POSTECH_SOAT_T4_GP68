@@ -15,7 +15,7 @@ Este projeto é um dos módulos que compõe esta solução.
 
 1. **Módulo:** Backend.
 1. **Arquitetura:** Microserviço com API Gateway.
-1. **Padrões de Codificação:** Clean code.
+1. **Padrões de Codificação:** Hexagonal.
 1. **Padrão SAGA:** Coreografada.
 2. **Linguagem:** Java versão 17.
 1. **Banco de Dados:** PostgreSQL e MongoDB.
