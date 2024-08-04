@@ -84,3 +84,5 @@ Para este projeto foi feito uma análise de impacto dos dados pessoais (RIPD) no
 ---
 
 > * Para utilizar as APIs, baixe o arquivo [JSON](https://github.com/gleniomontovani/tech-challenge-api-gateway/blob/main/Tech-challenge.postman_collection.json), faça a importação no Postaman e altere a URL para a que foi gerada no Loand Balancer da AWS.
+
+> * Segue o link do vídeo demonstrando a arquitetura desenvolvida [aqui](https://youtu.be/9nAS2MkmzEM).
