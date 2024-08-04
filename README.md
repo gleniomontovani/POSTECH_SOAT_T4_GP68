@@ -21,27 +21,19 @@ Este projeto é um dos módulos que compõe esta solução.
 1. **Banco de Dados:** PostgreSQL e MongoDB.
 1. **Container:** Docker.
 1. **Orquestrador de Container:** Kubernetes.
- 
-##### 2. Desenhos Arquiteturais.
+1. **Serviço de infraestrutura Cloud:** AWS Amazon.
+##### 2. Desenho Arquitetural.
 
-###### 2.1. Requisitos de Infraestrutura.
+###### 2.1. Requisitos de negócio (problema).
 
-###### 2.1.1. Arquitetura de Infraestrutura.
+Para esta solução usamos o padrão SAGA Coreografada, pois o projeto é de pequeno porte e não temos muita complexidade negocial, este padrão será o mais adequado dado a sua simplicidade de implantação e compreensão. Também ajustamos todos os metodos para atender as propriedades de ACID e fazer contramedidas caso as transações venham a falhar.
 
-Segue abaixo o desenho de infraestrutura definido:
-
-![Infraestrutura AWS!](src/main/resources/images/kubernetes-in-docker.png "Infraestrutura AWS")
-
-###### 2.2. Requisitos de negócio (problema).
-
-Para esta solução usamos o padrão SAGA Coreografada, pois dada que o projeto é de pequeno porte e não temos muita complexidade negocial, este padrão será o mais adequado dado a sua simplicidade de implantação e compreensão. Também ajustamos todos os mestodos para atender as propriedades de ACID para fazer contramedidas caso as transações venham a falhar.
-
-###### 2.2.1. Arquitetura de Microserviços.
+###### 2.1.1. Arquitetura de Microserviços.
 Conforme informado anteriormente<sub>[1]</sub>, o padrão arquitetural definido para esse projeto foi a de microserviços. A arquitetura de microsserviços (geralmente chamada de microsserviços) refere-se a um estilo de arquitetura para o desenvolvimento de aplicativos. Os microsserviços permitem que um aplicativo grande seja separado em partes independentes menores, com cada parte tendo sua própria responsabilidade. Para atender a uma única solicitação do usuário, um aplicativo baseado em microsserviços pode chamar muitos microsserviços internos para compor a resposta.
 
 Para esse módulo, aplicamos esse conceito da seguinte forma:
 
-![Arquitetura de Microserviços!](src/main/resources/images/clean-architecture.png "Arquitetura de Microserviços")
+![Arquitetura de Microserviços!](microservicos.png "Arquitetura de Microserviços")
 
 
 ##### 3. Configuração e Execução:
