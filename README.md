@@ -40,11 +40,12 @@ Para esse módulo, aplicamos esse conceito da seguinte forma:
 
 1. Rode/Suba a pipeline da infraestrutura de [banco de dados](https://github.com/gleniomontovani/tech-challenge-pos-tech-postgres-terraform/actions/workflows/deploy_infraestrutura.yml).
 1. Depois suba a infraestrutura de serviços da AWS como: [EKS, EC2, Cognito e VPC](https://github.com/gleniomontovani/tech-challenge-pos-tech-infraestrutura-terraform/actions/workflows/create_infra_api.yml).
-1. Agora rode a pipeline da [API Gateway](https://github.com/gleniomontovani/tech-challenge-api-gateway/actions/workflows/deploy_aplication.yml)
 1. Após isso, rode/suba os microserviços: <br>
    4.1 - Primeiro rode o microserviço de [Pedidos](https://github.com/gleniomontovani/POSTECH_SOAT_T4_GP68/actions/workflows/pedido.yml) <br>
    4.2 - Depois rode o microserviço  de [Pagamento](https://github.com/gleniomontovani/POSTECH_SOAT_T4_GP68/actions/workflows/pagamento.yml) <br>
-   4.3 - Posteriormente, rode o microserviço de [Produção](https://github.com/gleniomontovani/POSTECH_SOAT_T4_GP68/actions/workflows/producao.yml) <br>
+   4.3 - Posteriormente, rode o microserviço de [Produção](https://github.com/gleniomontovani/POSTECH_SOAT_T4_GP68/actions/workflows/producao.yml) <br> 
+1. Agora rode a pipeline da [API Gateway](https://github.com/gleniomontovani/tech-challenge-api-gateway/actions/workflows/deploy_aplication.yml)
+
 
 As infraestrutura de banco de dados e de serviços AWS estão com as pipeline configuradas para rodarem de forma manual. Já as pipeline dos microserviços e da API Gateway rodaram com um Pull Request para a branch main.
 
