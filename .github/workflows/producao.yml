@@ -1,17 +1,9 @@
  name: Build and Deploy Microserviço de Produção
 
- # on:
- #   pull_request:
- #      branches: [main]
-
  on:
-  workflow_dispatch:
-    inputs:
-      dir:
-        description: 'Directory with resources to make deploy'
-        required: true
-        default: 'tech-challenge-microservico-producao'
-      
+   pull_request:
+      branches: [main]
+     
  jobs:
    environment:
     runs-on: ubuntu-latest
