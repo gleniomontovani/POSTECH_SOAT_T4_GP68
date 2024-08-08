@@ -1,16 +1,8 @@
  name: Build and Deploy Microserviço de Pedido
 
- # on:
- #   pull_request:
- #      branches: [main]
-
  on:
-  workflow_dispatch:
-    inputs:
-      dir:
-        description: 'Directory with resources to make deploy'
-        required: true
-        default: 'tech-challenge-microservico-pedido'
+   pull_request:
+      branches: [main]
       
  jobs:
    environment:
